@@ -12,7 +12,8 @@
     "seed:users": "ts-node seeders/userSeeder.ts",
     "seed:categories": "ts-node seeders/categorySeeder.ts",
     "seed:blogs": "ts-node seeders/blogSeeder.ts",
-    "seed:clear": "ts-node -e \"import('./seeders/index.ts').then(m => m.runSeeders())\""
+    "seed:clear": "ts-node -e \"import('./seeders/index.ts').then(m => m.runSeeders())\"",
+    "migrate": "npm run seed"
   },
   "author": "",
   "license": "ISC",

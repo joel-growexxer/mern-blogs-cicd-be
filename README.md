@@ -104,13 +104,14 @@ npm run seed:clear        # Clear and reseed all data
 - `npm run build` - Build TypeScript to JavaScript
 - `npm test` - Run tests (placeholder)
 
-### Database Seeding
+### Database Seeding & Migration
 - `npm run seed` - Run all seeders (users, categories, blogs)
 - `npm run seed:users` - Seed users only
 - `npm run seed:categories` - Seed categories only  
 - `npm run seed:blogs` - Seed blogs only
 - `npm run seed:run` - Interactive seeder utility
 - `npm run seed:clear` - Clear and reseed all data
+- `npm run migrate` - Run database migration (used in CI/CD)
 
 ## Caching
 
@@ -263,6 +264,50 @@ blogs-ci-cd-be/
 5. **Authentication**: Use the seeded admin account for testing admin features
 6. **Caching**: Monitor cache performance through the health endpoint
 
+## CI/CD Pipeline
+
+This project includes a simple GitHub Actions CI/CD pipeline that automatically builds and deploys your application.
+
+### What it does
+1. **Build**: Installs dependencies and compiles TypeScript
+2. **Migration**: Runs database seeders to set up initial data
+3. **Deploy**: Deploys to your server using PM2
+
+### Setup
+1. **Add GitHub Secrets** to your repository:
+   - `SERVER_HOST` - Your server IP address or domain
+   - `SERVER_USER` - SSH username for your server
+   - `SERVER_SSH_KEY` - Private SSH key content for server access
+
+2. **Server Requirements**:
+   ```bash
+   # Install Node.js 20+ and PM2
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   sudo npm install -g pm2
+   
+   # Create project directory
+   sudo mkdir -p /var/www/blogs-backend
+   sudo chown $USER:$USER /var/www/blogs-backend
+   ```
+
+3. **Environment Variables** on server (`.env` file):
+   ```env
+   NODE_ENV=production
+   PORT=5000
+   MONGODB_URI=mongodb://localhost:27017/blogs
+   REDIS_URL=redis://localhost:6379
+   JWT_SECRET=your-production-secret-key
+   JWT_EXPIRES_IN=7d
+   ```
+
+### How it works
+- **Pull Requests**: Only builds to verify code compiles
+- **Push to main**: Builds and deploys to your server
+- **Deployment Process**: Git pull → Install → Build → Migrate → Restart PM2
+
+For detailed setup instructions, see [README-SIMPLE-CICD.md](./README-SIMPLE-CICD.md)
+
 ## Production Considerations
 
 1. **Environment Variables**: Set all required environment variables
@@ -272,3 +317,4 @@ blogs-ci-cd-be/
 5. **CORS**: Configure FRONTEND_URL for your production domain
 6. **Rate Limiting**: Adjust rate limits based on your needs
 7. **Logging**: Consider adding structured logging for production monitoring
+8. **CI/CD**: Configure GitHub secrets and server for automated deployment
